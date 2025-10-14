@@ -1,4 +1,3 @@
-
 from flask import Flask, request, send_from_directory
 import base64
 import smtplib
@@ -26,7 +25,7 @@ def submit():
 
     msg = EmailMessage()
     msg['Subject'] = '📦 Neue Lieferbestätigung'
-    msg['From'] = 'noreply@example.com'
+    msg['From'] = os.getenv('EMAIL_USER')  # sichere Nutzung
     msg['To'] = 'besard.qazimi@siegwerk.com'
     msg.set_content(f"Lieferadresse: {address}\nDatum: {date}")
 
@@ -34,10 +33,16 @@ def submit():
         msg.add_attachment(f.read(), maintype='image', subtype='png', filename=filename)
 
     try:
-        with smtplib.SMTP('smtp.example.com', 587) as smtp:
+        smtp_server = os.getenv('SMTP_SERVER', 'smtp.office365.com')
+        smtp_port = int(os.getenv('SMTP_PORT', 587))
+        email_user = os.getenv('EMAIL_USER')
+        email_pass = os.getenv('EMAIL_PASS')
+
+        with smtplib.SMTP(smtp_server, smtp_port) as smtp:
             smtp.starttls()
-            smtp.login('user@example.com', 'password')
+            smtp.login(email_user, email_pass)
             smtp.send_message(msg)
+
         os.remove(filename)
         return '✅ E-Mail erfolgreich gesendet!'
     except Exception as e:
