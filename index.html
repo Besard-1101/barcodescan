@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lieferbestätigung</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        canvas { border: 1px solid #000; }
+    </style>
+</head>
+<body>
+    <h2>📦 Barcode scannen & unterschreiben</h2>
+    <button onclick="startScanner()">📷 Barcode scannen</button>
+    <div id="scanner" style="width:300px;height:200px;"></div>
+    <p><strong>Lieferadresse:</strong> <span id="address"></span></p>
+    <p><strong>Datum:</strong> <span id="date"></span></p>
+    <h3>✍️ Unterschrift:</h3>
+    <canvas id="signature" width="300" height="100"></canvas><br>
+    <button onclick="clearSignature()">🧹 Löschen</button>
+    <button onclick="submitData()">📧 Senden</button>
+
+    <script>
+        const canvas = document.getElementById('signature');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        canvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); });
+        canvas.addEventListener('mouseup', e => { drawing = false; });
+        canvas.addEventListener('mousemove', draw);
+
+        function draw(e) {
+            if (!drawing) return;
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        }
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function startScanner() {
+            Quagga.init({
+                inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#scanner') },
+                decoder: { readers: ["code_128_reader", "ean_reader", "ean_8_reader"] }
+            }, function(err) {
+                if (err) return console.error(err);
+                Quagga.start();
+            });
+
+            Quagga.onDetected(data => {
+                document.getElementById('address').textContent = data.codeResult.code;
+                document.getElementById('date').textContent = new Date().toLocaleString();
+                Quagga.stop();
+            });
+        }
+
+        function submitData() {
+            const address = document.getElementById('address').textContent;
+            const date = document.getElementById('date').textContent;
+            const signature = canvas.toDataURL();
+
+            fetch('/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address, date, signature })
+            }).then(res => res.text()).then(alert);
+        }
+    </script>
+</body>
+</html>
