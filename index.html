@@ -2,10 +2,11 @@
 <html>
 <head>
     <title>Lieferbestätigung</title>
-    https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js</script>
+    <script/cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js</script>
     <style>
         body { font-family: Arial; margin: 20px; }
         canvas { border: 1px solid #000; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -18,15 +19,16 @@
     <h3>✍️ Unterschrift:</h3>
     <canvas id="signature" width="300" height="100"></canvas><br>
     <button onclick="clearSignature()">🧽 Löschen</button>
-    <button onclick="submitData()">📧 Senden</button>
+    <button id="sendBtn" onclick="submitData()" disabled>📧 Senden</button>
 
     <script>
         const canvas = document.getElementById('signature');
         const ctx = canvas.getContext('2d');
         let drawing = false;
+        let barcodeValid = false;
 
         canvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); });
-        canvas.addEventListener('mouseup', e => { drawing = false; });
+        canvas.addEventListener('mouseup', e => { drawing = false; checkSignature(); });
         canvas.addEventListener('mousemove', draw);
 
         function draw(e) {
@@ -39,6 +41,16 @@
 
         function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            checkSignature();
+        }
+
+        function checkSignature() {
+            const empty = ctx.getImageData(0, 0, canvas.width, canvas.height).data.every(pixel => pixel === 0);
+            toggleSendButton(!empty && barcodeValid);
+        }
+
+        function toggleSendButton(enable) {
+            document.getElementById('sendBtn').disabled = !enable;
         }
 
         function startScanner() {
@@ -51,16 +63,36 @@
             });
 
             Quagga.onDetected(data => {
-                document.getElementById('address').textContent = data.codeResult.code;
+                const code = data.codeResult.code;
+
+                if (code.startsWith("00") && code.length >= 20) {
+                    document.getElementById('address').textContent = `✅ NVE erkannt: ${code}`;
+                    barcodeValid = true;
+                } else {
+                    document.getElementById('address').textContent = `❌ Kein gültiger NVE: ${code}`;
+                    barcodeValid = false;
+                }
+
                 document.getElementById('date').textContent = new Date().toLocaleString();
                 Quagga.stop();
+                checkSignature();
 
-                // Scrollt automatisch zum Unterschriftsfeld
                 document.getElementById('signature').scrollIntoView({ behavior: 'smooth' });
             });
         }
 
         function submitData() {
+            if (!barcodeValid) {
+                alert("Bitte zuerst einen gültigen NVE-Barcode scannen!");
+                return;
+            }
+
+            const empty = ctx.getImageData(0, 0, canvas.width, canvas.height).data.every(pixel => pixel === 0);
+            if (empty) {
+                alert("Bitte unterschreiben, bevor Sie senden!");
+                return;
+            }
+
             const address = document.getElementById('address').textContent;
             const date = document.getElementById('date').textContent;
             const signature = canvas.toDataURL();
