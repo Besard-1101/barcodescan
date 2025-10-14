@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Lieferbestätigung</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js</script>
     <style>
         body { font-family: Arial; margin: 20px; }
         canvas { border: 1px solid #000; }
@@ -15,9 +14,10 @@
     <div id="scanner" style="width:300px;height:200px;"></div>
     <p><strong>Lieferadresse:</strong> <span id="address"></span></p>
     <p><strong>Datum:</strong> <span id="date"></span></p>
+
     <h3>✍️ Unterschrift:</h3>
     <canvas id="signature" width="300" height="100"></canvas><br>
-    <button onclick="clearSignature()">🧹 Löschen</button>
+    <button onclick="clearSignature()">🧽 Löschen</button>
     <button onclick="submitData()">📧 Senden</button>
 
     <script>
@@ -54,6 +54,9 @@
                 document.getElementById('address').textContent = data.codeResult.code;
                 document.getElementById('date').textContent = new Date().toLocaleString();
                 Quagga.stop();
+
+                // Scrollt automatisch zum Unterschriftsfeld
+                document.getElementById('signature').scrollIntoView({ behavior: 'smooth' });
             });
         }
 
