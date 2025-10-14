@@ -27,7 +27,7 @@ def submit():
     msg = EmailMessage()
     msg['Subject'] = '📦 Neue Lieferbestätigung'
     msg['From'] = 'noreply@example.com'
-    msg['To'] = '******@example.com'
+    msg['To'] = 'besard.qazimi@siegwerk.com'
     msg.set_content(f"Lieferadresse: {address}\nDatum: {date}")
 
     with open(filename, 'rb') as f:
