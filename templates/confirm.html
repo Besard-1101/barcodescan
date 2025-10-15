@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Bestätigung</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        canvas { border: 1px solid #000; }
+    </style>
+</head>
+<body>
+    <h2>Code: {{ code }}</h2>
+    /send
+        <label>Datum:</label>
+        <input type="date" name="date" required><br><br>
+        <label>Unterschrift:</label><br>
+        <canvas id="sigCanvas" width="300" height="100"></canvas><br>
+        <button type="button" onclick="clearCanvas()">Löschen</button><br><br>
+        <input type="hidden" name="signature" id="signatureInput">
+        <button type="submit" onclick="prepareSignature()">Senden</button>
+    </form>
+    <script>
+        const canvas = document.getElementById("sigCanvas");
+        const ctx = canvas.getContext("2d");
+        let drawing = false;
+
+        canvas.addEventListener("mousedown", () => drawing = true);
+        canvas.addEventListener("mouseup", () => drawing = false);
+        canvas.addEventListener("mouseout", () => drawing = false);
+        canvas.addEventListener("mousemove", draw);
+
+        function draw(e) {
+            if (!drawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineWidth = 2;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "#000";
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+        }
+
+        function prepareSignature() {
+            const dataURL = canvas.toDataURL();
+            document.getElementById("signatureInput").value = dataURL;
+        }
+    </script>
+</body>
+</html>
