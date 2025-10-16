@@ -2,13 +2,17 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Scanner</title>
+    <title>Barcode / QR-Code Scanner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     https://unpkg.com/html5-qrcode</script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 20px; }
+        #reader { width: 300px; margin: auto; }
+    </style>
 </head>
 <body>
     <h2>Barcode / QR-Code scannen</h2>
-    <div id="reader" style="width:300px;"></div>
+    <div id="reader"></div>
     /confirm
         <input type="hidden" name="code" id="codeInput">
     </form>
