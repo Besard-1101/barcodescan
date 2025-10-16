@@ -5,29 +5,45 @@
     <title>Bestätigung</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        canvas { border: 1px solid #000; }
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 20px; }
+        canvas {
+            border: 1px solid #000;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <h2>Code: {{ code }}</h2>
+
     /send
-        <label>Datum:</label>
-        <input type="date" name="date" required><br><br>
+        <label for="date">Datum:</label><br>
+        <input type="date" name="datecode" id="date" required><br><br>
+
         <label>Unterschrift:</label><br>
         <canvas id="sigCanvas" width="300" height="100"></canvas><br>
         <button type="button" onclick="clearCanvas()">Löschen</button><br><br>
+
         <input type="hidden" name="signature" id="signatureInput">
-        <button type="submit" onclick="prepareSignature()">Senden</button>
+        <button type="submit">Senden</button>
     </form>
+
     <script>
         const canvas = document.getElementById("sigCanvas");
         const ctx = canvas.getContext("2d");
         let drawing = false;
 
         canvas.addEventListener("mousedown", () => drawing = true);
-        canvas.addEventListener("mouseup", () => drawing = false);
-        canvas.addEventListener("mouseout", () => drawing = false);
+        canvas.addEventListener("mouseup", () => {
+            drawing = false;
+            ctx.beginPath();
+        });
+        canvas.addEventListener("mouseout", () => {
+            drawing = false;
+            ctx.beginPath();
+        });
         canvas.addEventListener("mousemove", draw);
 
         function draw(e) {
