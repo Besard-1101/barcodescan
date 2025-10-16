@@ -4,9 +4,9 @@ import os
 import base64
 
 app = Flask(__name__)
-app.secret_key = 'geheim'  # Session-Sicherheit
+app.secret_key = 'geheim'  # Für Sessions
 
-# Mail-Konfiguration aus Umgebungsvariablen
+# Mail-Konfiguration (kann auch aus .env geladen werden)
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.example.com')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
 app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
@@ -51,3 +51,4 @@ def send():
 
 if __name__ == "__main__":
     app.run(debug=True)
+``
